@@ -22,13 +22,11 @@ public class MainController : MonoBehaviour
     void Update()
     {
         // Call methods from each controller
-        thrustController.ProcessThrust();
+        thrustController.ProcessThrust(); 
         thrustController.UpdateThrottleUI();
         fuelController.ConsumeFuel(thrustController.Throttle);
         fuelController.UpdateFuelText();
         speedController.CalculateSpeed();
-        sideThrusterController.SideThrusterFunctions();
-        speedController.CalculateSpeed();
-
+        sideThrusterController.SideThrusterFunctions();    
     }
 }
