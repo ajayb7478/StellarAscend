@@ -61,7 +61,7 @@ public class ThrustController : MonoBehaviour
     {
         float thrustMultiplier = mainThrust * throttle;
 
-        rb.AddRelativeForce(Vector3.up * thrustMultiplier);
+        rb.AddRelativeForce(Vector3.up * thrustMultiplier * Time.deltaTime * 490);
         // Calculate the desired volume based on thrust
         float desiredVolume = Mathf.Lerp(0.3f, 1f, throttle); // Adjust the volume range as needed
         // Calculate the desired pitch based on thrust

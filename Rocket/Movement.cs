@@ -108,7 +108,7 @@ public class Movement : MonoBehaviour
         if (currentFuel > 0f)
         {
             // Consume fuel based on thrust
-            float fuelConsumed = thrustMultiplier * fuelConsumptionRate * Time.deltaTime;
+            float fuelConsumed = throttle * fuelConsumptionRate * Time.deltaTime;
             currentFuel = Mathf.Max(0f, currentFuel - fuelConsumed);
 
             // Apply thrust
