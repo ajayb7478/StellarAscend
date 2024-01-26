@@ -10,7 +10,7 @@ public class NavigationController : MonoBehaviour
     public Transform landingPad;
     public Vector2 screenOffset = new Vector2(20f, 20f); // Adjust the offset as needed
     public float horizontalTextOffset = 30f; // Adjust the horizontal offset
-    public float verticalTextOffset = 30f; // Adjust the vertical offset
+    public float verticalTextOffset = 30f; // Adjust the vertical offset done
 
     private TextMeshProUGUI distanceText;
 
