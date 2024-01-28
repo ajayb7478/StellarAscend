@@ -8,7 +8,7 @@ public class MainController : MonoBehaviour
     private SpeedController speedController;
     private SideThrusterController sideThrusterController;
 
-    
+
     void Start()
     {
         // Assuming each controller is attached to the same GameObject as MainController
@@ -22,11 +22,11 @@ public class MainController : MonoBehaviour
     void Update()
     {
         // Call methods from each controller
-        thrustController.ProcessThrust(); 
+        thrustController.ProcessThrust(fuelController.CurrentFuel);
         thrustController.UpdateThrottleUI();
         fuelController.ConsumeFuel(thrustController.Throttle);
         fuelController.UpdateFuelText();
         speedController.CalculateSpeed();
-        sideThrusterController.SideThrusterFunctions();    
+        sideThrusterController.SideThrusterFunctions();
     }
 }

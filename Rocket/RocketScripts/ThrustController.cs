@@ -9,7 +9,6 @@ public class ThrustController : MonoBehaviour
     float throttle = 0f;
     AudioSource audioSource;
     public TextMeshProUGUI throttleText;
-
     public float Throttle { get { return throttle; } }
 
     void Start()
@@ -29,21 +28,30 @@ public class ThrustController : MonoBehaviour
         throttleText.text = "Throttle: " + Mathf.Round(throttle * 100f) + "%";
     }
 
-    public void ProcessThrust()
+    public void ProcessThrust(float fuel)
     {
         if (Input.GetKey(KeyCode.W))
         {
-            IncreaseThrottle();
+            if (fuel > 0)
+            {
+                IncreaseThrottle();
+            }
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            DecreaseThrottle();
+            if (fuel > 0)
+            {
+                DecreaseThrottle();
+            }
         }
         else if (Input.GetKey(KeyCode.X))
         {
             StopThrusting();
         }
-
+        else if (fuel == 0)
+        {
+            StopThrusting();
+        }
         ApplyThrust();
     }
 

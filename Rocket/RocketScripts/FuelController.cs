@@ -8,7 +8,7 @@ public class FuelController : MonoBehaviour
     [SerializeField] float fuelConsumptionRate = 10f;
     public TextMeshProUGUI fuelText;
 
-    //public float CurrentFuel { get { return currentFuel; } }
+    public float CurrentFuel { get { return currentFuel; } }
 
     void Start()
     {
