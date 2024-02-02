@@ -23,22 +23,36 @@ public class CollisionHandler : MonoBehaviour
     bool collisionDisabled = false;
     Rigidbody rocketRigidbody; // Reference to the Rigidbody component of the rocket
     float rocketSpeed;
+    private ThrustController thrustController;
+    float currentThrottle;
+    float roundedThrottle;
+    bool isLanded;
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        rocketRigidbody = GetComponent<Rigidbody>();      
+        rocketRigidbody = GetComponent<Rigidbody>();
+        thrustController = GetComponent<ThrustController>();
         // Get the MeshRenderer from the specified GameObjec
         // Get the reference to the Rigidbody component
+        isLanded = false;
     }
 
     void Update()
     {
         //RespondToDebugKeys();
         UpdateRocketSpeed();
+        currentThrottle = thrustController.Throttle;
+        roundedThrottle = Mathf.Round(currentThrottle * 10f) / 10f;
+        Debug.Log(roundedThrottle);
+        if (roundedThrottle == 0 && isLanded == true && !isTransitioning)
+        {
+            StartSuccessSequence();
+            Debug.Log("Success Sequence Conditions Met!");
+        }
     }
 
-    
+
 
     void RespondToDebugKeys()
     {
@@ -66,7 +80,7 @@ public class CollisionHandler : MonoBehaviour
         // Check if the collision is with the ground and the speed is less than -30
         if (other.gameObject.CompareTag("Finish") && rocketSpeed > -50f)
         {
-            StartSuccessSequence();
+            isLanded = true;
         }
         else
         {
@@ -89,6 +103,8 @@ public class CollisionHandler : MonoBehaviour
     {
         audioSource.Stop();
         isTransitioning = true;
+        audioSource.volume = 1f;
+        audioSource.pitch = 1f;
         audioSource.PlayOneShot(successSFX);
         successVFX.Play();
         GetComponent<MainController>().enabled = false;
@@ -103,6 +119,8 @@ public class CollisionHandler : MonoBehaviour
     {
         audioSource.Stop();
         isTransitioning = true;
+        audioSource.volume = 1f;
+        audioSource.pitch = 1f;
         audioSource.PlayOneShot(crashSFX);
         crashVFX.Play();
         GetComponent<MainController>().enabled = false;
