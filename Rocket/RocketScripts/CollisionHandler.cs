@@ -11,14 +11,11 @@ using UnityEngine.SceneManagement;
 public class CollisionHandler : MonoBehaviour
 {
     [SerializeField] float levelLoadDelay = 5f;
-
     [SerializeField] AudioClip crashSFX;
     [SerializeField] AudioClip successSFX;
-
     [SerializeField] ParticleSystem crashVFX;
     [SerializeField] ParticleSystem successVFX;
     AudioSource audioSource;
-
     bool isTransitioning = false;
     bool collisionDisabled = false;
     Rigidbody rocketRigidbody; // Reference to the Rigidbody component of the rocket
@@ -44,15 +41,13 @@ public class CollisionHandler : MonoBehaviour
         UpdateRocketSpeed();
         currentThrottle = thrustController.Throttle;
         roundedThrottle = Mathf.Round(currentThrottle * 10f) / 10f;
-        Debug.Log(roundedThrottle);
+        //Debug.Log(roundedThrottle);
         if (roundedThrottle == 0 && isLanded == true && !isTransitioning)
         {
             StartSuccessSequence();
             Debug.Log("Success Sequence Conditions Met!");
         }
     }
-
-
 
     void RespondToDebugKeys()
     {
@@ -113,8 +108,8 @@ public class CollisionHandler : MonoBehaviour
         GetComponent<SideThrusterController>().enabled = false;
         GetComponent<ThrustController>().enabled = false;
         Invoke("LoadnextLevel", levelLoadDelay);
-
     }
+
     void StartCrashSequence()
     {
         audioSource.Stop();
@@ -135,11 +130,13 @@ public class CollisionHandler : MonoBehaviour
         }
         Invoke("ReloadLevel", levelLoadDelay);
     }
+
     void ReloadLevel()
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex);
     }
+
     void LoadnextLevel()
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
