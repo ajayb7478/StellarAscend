@@ -40,6 +40,7 @@ public class NavigationController : MonoBehaviour
     {
         // Check the relative height
         float rocketRelativeHeight = rocketHeightCalculator.GetRelativeHeight();
+
         if (rocketRelativeHeight < ObjectiveHeight && sphereIndicatorActive == true)
         {
             SphereIndicator(); // Run SphereIndicator method
@@ -51,18 +52,18 @@ public class NavigationController : MonoBehaviour
         }
     }
 
-    public void SphereIndicator()
+    void SphereIndicator()
     {
         if (rocket == null || sphere == null || navigationArrow == null || canvas == null || distanceText == null)
             return;
 
-        // Get the relative position of the landing pad with respect to the rocket
+        
         Vector3 relativePosition = rocket.InverseTransformPoint(sphere.position);
 
-        // Calculate the distance from the rocket to the landing pad
+        
         float distance = Vector3.Distance(rocket.position, sphere.position);
 
-        // Get the position of the landing pad in screen space
+        
         Vector3 screenPos = Camera.main.WorldToScreenPoint(sphere.position);
 
         // If the landing pad is behind the camera, flip the arrow
@@ -86,7 +87,7 @@ public class NavigationController : MonoBehaviour
         }
     }
 
-    public void LandingIndicator()
+    void LandingIndicator()
     {
         if (rocket == null || landingPad == null || navigationArrow == null || canvas == null || distanceText == null)
             return;
