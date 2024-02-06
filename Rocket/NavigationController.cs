@@ -39,9 +39,16 @@ public class NavigationController : MonoBehaviour
     void Update()
     {
         // Check the relative height
+        Vector3 relativePosition = rocket.InverseTransformPoint(sphere.position);
+
+
+        float sphereDistance = Vector3.Distance(rocket.position, sphere.position);
+
+        Debug.Log(sphereDistance);
+
         float rocketRelativeHeight = rocketHeightCalculator.GetRelativeHeight();
 
-        if (rocketRelativeHeight < ObjectiveHeight && sphereIndicatorActive == true)
+        if (sphereDistance >= 10f && sphereIndicatorActive == true)
         {
             SphereIndicator(); // Run SphereIndicator method
         }

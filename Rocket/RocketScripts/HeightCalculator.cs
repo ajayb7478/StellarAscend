@@ -24,7 +24,7 @@ public class HeightCalculator : MonoBehaviour
         // Calculate relative height
         relativeHeight = transform.position.y + initialHeight;
         // Do something with the relative height value, like printing it to the console
-        Debug.Log("Relative Height: " + relativeHeight);
+        //Debug.Log("Relative Height: " + relativeHeight);
     }
 
     // Public method to get the relativeHeight value
