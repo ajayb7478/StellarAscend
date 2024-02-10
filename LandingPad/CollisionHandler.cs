@@ -23,6 +23,8 @@ public class CollisionHandler : MonoBehaviour
     private ThrustController thrustController;
     float currentThrottle;
     float roundedThrottle;
+    float zRotation;
+    int zRotationInt;
     bool isLanded;
 
     void Start()
@@ -33,6 +35,7 @@ public class CollisionHandler : MonoBehaviour
         // Get the MeshRenderer from the specified GameObjec
         // Get the reference to the Rigidbody component
         isLanded = false;
+        //GetComponent<RocketPostLander>().enabled = false;
     }
 
     void Update()
@@ -42,11 +45,12 @@ public class CollisionHandler : MonoBehaviour
         currentThrottle = thrustController.Throttle;
         roundedThrottle = Mathf.Round(currentThrottle * 10f) / 10f;
         //Debug.Log(roundedThrottle);
-        if (roundedThrottle == 0 && isLanded == true && !isTransitioning)
+        if (roundedThrottle == 0 && isLanded == true && !isTransitioning && zRotationInt == 0)
         {
             StartSuccessSequence();
             Debug.Log("Success Sequence Conditions Met!");
         }
+        UpdateZRotation();
     }
 
     void RespondToDebugKeys()
@@ -66,6 +70,18 @@ public class CollisionHandler : MonoBehaviour
     {
         // Calculate the speed in the same relative direction as the thrust
         rocketSpeed = Vector3.Dot(rocketRigidbody.velocity, transform.up) * 10;
+
+    }
+
+    void UpdateZRotation()
+    {
+        // Get the rotation euler angles of the rocket
+        Vector3 rotationAngles = transform.rotation.eulerAngles;
+        // Extract the rotation about the z-axis
+        zRotation = rotationAngles.z;
+        zRotationInt = Mathf.RoundToInt(zRotation);
+        // Do something with the zRotation value, such as printing it or using it in your logic
+        Debug.Log("Z Rotation: " + zRotationInt);
     }
 
     private void OnCollisionEnter(Collision other)

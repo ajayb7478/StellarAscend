@@ -18,7 +18,7 @@ public class NavigationController : MonoBehaviour
 
 
     bool sphereIndicatorActive;
-    public HeightCalculator rocketHeightCalculator;
+    
     [SerializeField] float ObjectiveHeight;
 
     void Start()
@@ -44,9 +44,9 @@ public class NavigationController : MonoBehaviour
 
         float sphereDistance = Vector3.Distance(rocket.position, sphere.position);
 
-        Debug.Log(sphereDistance);
+        //Debug.Log(sphereDistance);
 
-        float rocketRelativeHeight = rocketHeightCalculator.GetRelativeHeight();
+       
 
         if (sphereDistance >= 10f && sphereIndicatorActive == true)
         {
