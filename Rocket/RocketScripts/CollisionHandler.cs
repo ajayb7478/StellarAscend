@@ -102,7 +102,6 @@ public class CollisionHandler : MonoBehaviour
         audioSource.pitch = 1f;
         audioSource.PlayOneShot(successSFX);
         successVFX.Play();
-        GetComponent<MainController>().enabled = false;
         GetComponent<FuelController>().enabled = false;
         GetComponent<SpeedController>().enabled = false;
         GetComponent<SideThrusterController>().enabled = false;
@@ -118,7 +117,6 @@ public class CollisionHandler : MonoBehaviour
         audioSource.pitch = 1f;
         audioSource.PlayOneShot(crashSFX);
         crashVFX.Play();
-        GetComponent<MainController>().enabled = false;
         GetComponent<FuelController>().enabled = false;
         GetComponent<SpeedController>().enabled = false;
         GetComponent<SideThrusterController>().enabled = false;

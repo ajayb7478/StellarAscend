@@ -9,6 +9,7 @@ public class FuelController : MonoBehaviour
     public TextMeshProUGUI fuelText;
 
     public float CurrentFuel { get { return currentFuel; } }
+    private ThrustController thrustController;
 
     void Start()
     {
@@ -19,9 +20,16 @@ public class FuelController : MonoBehaviour
         {
             UpdateFuelText();
         }
+        thrustController = GetComponent<ThrustController>();
     }
 
-    public void UpdateFuelText()
+    void Update()
+    {
+        UpdateFuelText();
+        ConsumeFuel(thrustController.Throttle);
+    }
+
+    void UpdateFuelText()
     {
         if (fuelText != null)
         {
@@ -29,7 +37,7 @@ public class FuelController : MonoBehaviour
         }
     }
 
-    public void ConsumeFuel(float throttle)
+    void ConsumeFuel(float throttle)
     {
         if (throttle > 0f)
         {

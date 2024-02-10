@@ -19,10 +19,15 @@ public class SpeedController : MonoBehaviour
         }
     }
 
-    public void CalculateSpeed()
+    void Update()
+    {
+        CalculateSpeed();
+        UpdateSpeedText();
+    }
+
+    void CalculateSpeed()
     {
         currentSpeed = Vector3.Dot(rb.velocity, transform.up) * 10;
-        UpdateSpeedText();
     }
 
     void UpdateSpeedText()

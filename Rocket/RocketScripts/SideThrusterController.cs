@@ -13,7 +13,12 @@ public class SideThrusterController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-    public void SideThrusterFunctions()
+    void Update()
+    {
+        SideThrusterFunctions();
+    }
+
+    void SideThrusterFunctions()
     {
         if (Input.GetKey(KeyCode.A))
         {

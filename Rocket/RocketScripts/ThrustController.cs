@@ -10,6 +10,7 @@ public class ThrustController : MonoBehaviour
     AudioSource audioSource;
     public TextMeshProUGUI throttleText;
     public float Throttle { get { return throttle; } }
+    private FuelController fuelController;
 
     void Start()
     {
@@ -20,15 +21,22 @@ public class ThrustController : MonoBehaviour
         {
             UpdateThrottleUI();
         }
+        fuelController = GetComponent<FuelController>();
     }
 
-    public void UpdateThrottleUI()
+    void Update()
+    {
+        ProcessThrust(fuelController.CurrentFuel);
+        UpdateThrottleUI();
+    }
+
+    void UpdateThrottleUI()
     {
         // Assuming ThrustController has a property named Throttle
         throttleText.text = "Throttle: " + Mathf.Round(throttle * 100f) + "%";
     }
 
-    public void ProcessThrust(float fuel)
+    void ProcessThrust(float fuel)
     {
         if (Input.GetKey(KeyCode.W))
         {
