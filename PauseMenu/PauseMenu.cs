@@ -26,4 +26,10 @@ public class PauseMenu : MonoBehaviour
         SceneManager.LoadScene(sceneID);
     }
 
+    public void RestartLevel()
+    {
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex);
+        Time.timeScale = 1f;
+    }
 }
