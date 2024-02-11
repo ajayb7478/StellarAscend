@@ -17,17 +17,34 @@ public class NavigationTutorial : MonoBehaviour
     private TextMeshProUGUI distanceText;
 
     public TextMeshProUGUI tutorialText;
-    private bool isColliding = true;
 
     bool sphereIndicatorActive;
     float delayTimer;
     bool hasDelayed = false;
+    private HeightCalculator height;
+    private SpeedController speed;
+    private CollisionHandler land;
+    bool hasReachedHeight;
+    bool isNavActive;
+    [SerializeField] int stepNo = 0;
+    float speedCheckTimer = 0f;
 
 
 
     void Start()
     {
         // Create a new GameObject for TextMeshPro and set it as a child of navigationArrow
+        //NavStart();
+        navigationArrow.enabled = false;
+        tutorialText.text = "Welcome To the Tutorial";
+        height = FindObjectOfType<HeightCalculator>();
+        speed = FindObjectOfType<SpeedController>();
+        land = FindObjectOfType<CollisionHandler>();
+    }
+
+    void NavStart()
+    {
+        navigationArrow.enabled = true;
         GameObject textMeshProObject = new GameObject("DistanceText");
         textMeshProObject.transform.SetParent(navigationArrow.transform, false);
         // Add TextMeshPro component to the new GameObject
@@ -38,41 +55,127 @@ public class NavigationTutorial : MonoBehaviour
         distanceText.color = Color.white;
         distanceText.alignment = TextAlignmentOptions.Center;
         sphereIndicatorActive = true;
-        tutorialText.text = "Welcome To the Tutorial";
-
     }
 
     void Update()
     {
-        float sphereDistance = CalculateDistance();
 
-        if (!hasDelayed)
+        float sphereDistance = CalculateSphereDistance();
+        float landingPadDistance = CalculateLandingPadDistance();
+        float actualSpeed = speed.CalculateSpeed();
+        float actualHeight = height.GetRelativeHeight();
+        bool landed = land.isLanded;
+        delayTimer += Time.deltaTime;
+        //delayTimer += Time.deltaTime;
+        if (stepNo == 0) // Check if 5 seconds have elapsed
         {
-            delayTimer += Time.deltaTime;
-            Debug.Log(isColliding);
-            if (delayTimer >= 5f) // Check if 5 seconds have elapsed
+            if (delayTimer >= 5f)
             {
-                tutorialText.text = "Move the Throttle Up slowly to lift off";
-                hasDelayed = true; // Set flag to indicate delay has occurred
-                if (!isColliding)
-                {
-                    tutorialText.text = "Try To Hover a Bit by experimenting with the throttle";
-                }
+                stepNo = 1;
             }
+        }
+        if (stepNo == 1)
+        {
+            tutorialText.text = "Move the Throttle Up By Pressing 'W' key to  lift off";
 
-            if (sphereDistance >= 10f && sphereIndicatorActive == true)
+            if (actualHeight > 10)
             {
-                SphereIndicator(); // Run SphereIndicator method
+                stepNo = 2;
+            }
+        }
+        if (stepNo == 2)
+        {
+            tutorialText.text = "Try To Hover a Bit by experimenting with the throttle";
+            if (actualSpeed > -10 && actualSpeed < 10)
+            {
+                // Increment the speed check timer
+                speedCheckTimer += Time.deltaTime;
+                if (speedCheckTimer >= 4f) // Check if the speed condition has been held for at least 10 seconds
+                {
+                    tutorialText.text = "Good you were able to Hover";
+                    StartCoroutine(DelayedIncrementStepNo(2f));
+                    stepNo = 3;
+                    speedCheckTimer = 0f;
+                }
             }
             else
             {
-                sphereIndicatorActive = false; // Stop SphereIndicator method
-                LandingIndicator(); // Run LandingIndicator method continuously
+                // Reset the speed check timer if the speed is not within the desired range
+                speedCheckTimer = 0f;
+            }
+        }
+        if (stepNo == 3)
+        {
+            tutorialText.text = "Now Use D Key to MoveRight";
+            if (Input.GetKey(KeyCode.D))
+            {
+                speedCheckTimer += Time.deltaTime;
+                if (speedCheckTimer >= 1f)
+                {
+                    tutorialText.text = "Good Job!";
+                    stepNo = 4;
+                }
+            }
+            else
+            {
+                // Reset the speed check timer if the speed is not within the desired range
+                speedCheckTimer = 0f;
+            }
+        }
+        if (stepNo == 4)
+        {
+            tutorialText.text = "Now Use A Key to Move Left";
+            if (Input.GetKey(KeyCode.A))
+            {
+                speedCheckTimer += Time.deltaTime;
+                if (speedCheckTimer >= 2f)
+                {
+                    tutorialText.text = "Good Job!";
+                    stepNo = 5;
+                }
+            }
+            else
+            {
+                // Reset the speed check timer if the speed is not within the desired range
+                speedCheckTimer = 0f;
+            }
+        }
+        if (stepNo == 5)
+        {
+            if (!navigationArrow.enabled)
+            {
+                NavStart();
+            }
+            /* StartCoroutine(DelayedIncrementStepNo(2f));
+            tutorialText.text = "Now Reach the navigation Point";
+            StartCoroutine(DelayedIncrementStepNo(2f)); */
+            SphereIndicator();
+            tutorialText.text = "Now Reach the navigation Point at an altitude";
+            if (sphereDistance <= 10f)
+            {
+                stepNo = 6;
+            }
+        }
+        if (stepNo == 6)
+        {
+            if (!navigationArrow.enabled)
+            {
+                NavStart();
+            }
+            tutorialText.text = "Now follow the Nav Arrow to Land by Lowering the Throttle";
+            sphereIndicatorActive = false; // Stop SphereIndicator method
+            LandingIndicator(); // Run LandingIndicator method continuously
+            //Debug.Log(landingPadDistance);
+            if (landingPadDistance < 10f)
+            {
+                tutorialText.text = "Touch Down Smoothly and Cut Throttle to 0 Press 'X' after touchdown";
+                LandingIndicator();
             }
         }
     }
 
-    private float CalculateDistance()
+
+    private float CalculateSphereDistance()
     {
         // Check the relative height
         Vector3 relativePosition = rocket.InverseTransformPoint(sphere.position);
@@ -83,6 +186,17 @@ public class NavigationTutorial : MonoBehaviour
         //Debug.Log(sphereDistance);
 
         return sphereDistance;
+    }
+
+    private float CalculateLandingPadDistance()
+    {
+        // Check the relative height
+        Vector3 relativePosition = rocket.InverseTransformPoint(landingPad.position);
+
+        float landingPadDistance = Vector3.Distance(rocket.position, landingPad.position);
+
+        //Debug.Log(landingPadDistance);
+        return landingPadDistance;
     }
 
     void SphereIndicator()
@@ -116,7 +230,7 @@ public class NavigationTutorial : MonoBehaviour
         if (distanceText != null)
         {
             distanceText.rectTransform.position = new Vector3(screenPos.x + horizontalTextOffset, screenPos.y - verticalTextOffset, screenPos.z);
-            distanceText.text = string.Format("{0:F2}M : Go To This Nav Point", distance);
+            distanceText.text = string.Format("{0:F2}M", distance);
         }
     }
 
@@ -151,17 +265,16 @@ public class NavigationTutorial : MonoBehaviour
         if (distanceText != null)
         {
             distanceText.rectTransform.position = new Vector3(screenPos.x + horizontalTextOffset, screenPos.y - verticalTextOffset, screenPos.z);
-            distanceText.text = string.Format("{0:F2}M Land on the Landing Pad", distance);
+            distanceText.text = string.Format("{0:F2}M", distance);
         }
     }
 
-    private void OnCollisionExit(Collision collision)
+    IEnumerator DelayedIncrementStepNo(float cglock)
     {
-        // Check if the previously collided object had the "Finish" tag
-        if (collision.gameObject.CompareTag("Friendly"))
-        {
-            // Set the collision flag to false
-            isColliding = false;
-        }
+        // Add a delay of 2 seconds
+        yield return new WaitForSeconds(cglock);
+        tutorialText.text = "";
+        // Increment stepNo after the delay
     }
+
 }

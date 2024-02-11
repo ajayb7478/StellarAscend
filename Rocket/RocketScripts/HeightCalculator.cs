@@ -7,6 +7,7 @@ public class HeightCalculator : MonoBehaviour
 
     // Variable to store the relative height
     private float relativeHeight;
+    private int integerHeight;
 
     void Start()
     {
@@ -17,12 +18,14 @@ public class HeightCalculator : MonoBehaviour
     {
         // Call the height calculation method
         HeightCalculation();
+       // Debug.Log(GetRelativeHeight());
     }
 
     void HeightCalculation()
     {
         // Calculate relative height
         relativeHeight = transform.position.y + initialHeight;
+        integerHeight = Mathf.RoundToInt(relativeHeight);
         // Do something with the relative height value, like printing it to the console
         //Debug.Log("Relative Height: " + relativeHeight);
     }
@@ -30,6 +33,6 @@ public class HeightCalculator : MonoBehaviour
     // Public method to get the relativeHeight value
     public float GetRelativeHeight()
     {
-        return relativeHeight;
+        return integerHeight;
     }
 }

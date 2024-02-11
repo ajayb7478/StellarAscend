@@ -25,7 +25,7 @@ public class CollisionHandler : MonoBehaviour
     float roundedThrottle;
     float zRotation;
     int zRotationInt;
-    bool isLanded;
+    public bool isLanded { get; private set; }
 
     void Start()
     {
@@ -81,7 +81,7 @@ public class CollisionHandler : MonoBehaviour
         zRotation = rotationAngles.z;
         zRotationInt = Mathf.RoundToInt(zRotation);
         // Do something with the zRotation value, such as printing it or using it in your logic
-        Debug.Log("Z Rotation: " + zRotationInt);
+        //Debug.Log("Z Rotation: " + zRotationInt);
     }
 
     private void OnCollisionEnter(Collision other)
