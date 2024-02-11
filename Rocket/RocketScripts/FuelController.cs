@@ -33,7 +33,20 @@ public class FuelController : MonoBehaviour
     {
         if (fuelText != null)
         {
+            string fuelString = Mathf.Round(currentFuel).ToString();
             fuelText.text = "Fuel: " + Mathf.Round(currentFuel).ToString();
+            if (currentFuel > 100f)
+            {
+                fuelText.text = "Fuel: <color=green>" + fuelString + "</color>";
+            }
+            else if (currentFuel < 100f && currentFuel > 50f)
+            {
+                fuelText.text = "Fuel: <color=yellow>" + fuelString + "</color>";
+            }
+            else
+            {
+                fuelText.text = "Fuel: <color=red>" + fuelString + "</color>";
+            }
         }
     }
 
