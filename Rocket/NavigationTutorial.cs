@@ -28,6 +28,8 @@ public class NavigationTutorial : MonoBehaviour
     bool isNavActive;
     [SerializeField] int stepNo = 0;
     float speedCheckTimer = 0f;
+    bool isCompleted = false;
+    float sphereDistance;
 
 
 
@@ -66,9 +68,12 @@ public class NavigationTutorial : MonoBehaviour
         float actualHeight = height.GetRelativeHeight();
         bool landed = land.isLanded;
         delayTimer += Time.deltaTime;
+        //Debug.Log(delayTimer);
         //delayTimer += Time.deltaTime;
+
         if (stepNo == 0) // Check if 5 seconds have elapsed
         {
+            tutorialText.text = "Welcome To the Tutorial";
             if (delayTimer >= 5f)
             {
                 stepNo = 1;
@@ -76,26 +81,26 @@ public class NavigationTutorial : MonoBehaviour
         }
         if (stepNo == 1)
         {
-            tutorialText.text = "Move the Throttle Up By Pressing 'W' key to  lift off";
+            tutorialText.text = "Move the Throttle Up By Pressing 'W' key to lift off";
 
             if (actualHeight > 10)
             {
-                stepNo = 2;
+                tutorialText.text = "Congratulations!!";
+                StartCoroutine(WaitForNextStep(1, 4));
             }
         }
         if (stepNo == 2)
         {
-            tutorialText.text = "Try To Hover a Bit by experimenting with the throttle";
+            tutorialText.text = "Try To Hover a Bit by experimenting with the throttle using 'W' and 'S'";
             if (actualSpeed > -10 && actualSpeed < 10)
             {
                 // Increment the speed check timer
                 speedCheckTimer += Time.deltaTime;
-                if (speedCheckTimer >= 4f) // Check if the speed condition has been held for at least 10 seconds
+                if (speedCheckTimer >= 5f) // Check if the speed condition has been held for at least 10 seconds
                 {
-                    tutorialText.text = "Good you were able to Hover";
-                    StartCoroutine(DelayedIncrementStepNo(2f));
-                    stepNo = 3;
-                    speedCheckTimer = 0f;
+                    tutorialText.text = "Congratulations!!";
+                    StartCoroutine(WaitForNextStep(2, 4));
+                    //speedCheckTimer = 0f;
                 }
             }
             else
@@ -106,14 +111,17 @@ public class NavigationTutorial : MonoBehaviour
         }
         if (stepNo == 3)
         {
-            tutorialText.text = "Now Use D Key to MoveRight";
-            if (Input.GetKey(KeyCode.D))
+            tutorialText.text = "Now Use 'D' Key to Move Right";
+            if (Input.GetKey(KeyCode.D) || speedCheckTimer >= 1f)
             {
                 speedCheckTimer += Time.deltaTime;
+                Debug.Log(speedCheckTimer);
                 if (speedCheckTimer >= 1f)
                 {
-                    tutorialText.text = "Good Job!";
-                    stepNo = 4;
+                    //speedCheckTimer = 3f;
+                    tutorialText.text = "Congratulations!!";
+                    StartCoroutine(WaitForNextStep(3, 3)); //stepNo Delay
+                    //speedCheckTimer = 0f;
                 }
             }
             else
@@ -124,14 +132,17 @@ public class NavigationTutorial : MonoBehaviour
         }
         if (stepNo == 4)
         {
-            tutorialText.text = "Now Use A Key to Move Left";
-            if (Input.GetKey(KeyCode.A))
+            tutorialText.text = "Now Use 'A' Key to Move Left";
+            if (Input.GetKey(KeyCode.A) || speedCheckTimer >= 1f)
             {
                 speedCheckTimer += Time.deltaTime;
-                if (speedCheckTimer >= 2f)
+                Debug.Log(speedCheckTimer);
+                if (speedCheckTimer >= 1f)
                 {
-                    tutorialText.text = "Good Job!";
-                    stepNo = 5;
+                    //speedCheckTimer = 3f;
+                    tutorialText.text = "Congratulations!!";
+                    StartCoroutine(WaitForNextStep(4, 3)); //stepNo Delay
+                    //speedCheckTimer = 0f;
                 }
             }
             else
@@ -145,15 +156,19 @@ public class NavigationTutorial : MonoBehaviour
             if (!navigationArrow.enabled)
             {
                 NavStart();
-            }
-            /* StartCoroutine(DelayedIncrementStepNo(2f));
-            tutorialText.text = "Now Reach the navigation Point";
-            StartCoroutine(DelayedIncrementStepNo(2f)); */
-            SphereIndicator();
-            tutorialText.text = "Now Reach the navigation Point at an altitude";
-            if (sphereDistance <= 10f)
+            }                     
+            if(isCompleted == false)
             {
-                stepNo = 6;
+                SphereIndicator();
+                tutorialText.text = "Now Reach the navigation Point at an altitude";
+            }
+            if (sphereDistance <= 10f || isCompleted == true)
+            {
+                isCompleted = true;
+                tutorialText.text = "Congratulations!!";
+                distanceText.text = "";
+                navigationArrow.enabled = false;
+                StartCoroutine(WaitForNextStep(5, 4));
             }
         }
         if (stepNo == 6)
@@ -165,7 +180,6 @@ public class NavigationTutorial : MonoBehaviour
             tutorialText.text = "Now follow the Nav Arrow to Land by Lowering the Throttle";
             sphereIndicatorActive = false; // Stop SphereIndicator method
             LandingIndicator(); // Run LandingIndicator method continuously
-            //Debug.Log(landingPadDistance);
             if (landingPadDistance < 10f)
             {
                 tutorialText.text = "Touch Down Smoothly and Cut Throttle to 0 Press 'X' after touchdown";
@@ -174,6 +188,15 @@ public class NavigationTutorial : MonoBehaviour
         }
     }
 
+    IEnumerator WaitForNextStep(int stepNumber, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (stepNo == stepNumber)
+        {
+            stepNo += 1;
+            speedCheckTimer = 0f;
+        }
+    }
 
     private float CalculateSphereDistance()
     {
@@ -269,12 +292,6 @@ public class NavigationTutorial : MonoBehaviour
         }
     }
 
-    IEnumerator DelayedIncrementStepNo(float cglock)
-    {
-        // Add a delay of 2 seconds
-        yield return new WaitForSeconds(cglock);
-        tutorialText.text = "";
-        // Increment stepNo after the delay
-    }
+
 
 }

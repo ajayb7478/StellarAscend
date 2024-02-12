@@ -48,7 +48,7 @@ public class CollisionHandler : MonoBehaviour
         if (roundedThrottle == 0 && isLanded == true && !isTransitioning && zRotationInt == 0)
         {
             StartSuccessSequence();
-            Debug.Log("Success Sequence Conditions Met!");
+            //Debug.Log("Success Sequence Conditions Met!");
         }
         UpdateZRotation();
     }
@@ -98,7 +98,7 @@ public class CollisionHandler : MonoBehaviour
             switch (other.gameObject.tag)
             {
                 case "Friendly":
-                    Debug.Log("This is a friendly object");
+                    //Debug.Log("This is a friendly object");
                     break;
                 case "Finish":
                     StartCrashSequence();
