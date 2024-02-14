@@ -15,7 +15,6 @@ public class NavigationTutorial : MonoBehaviour
     public float verticalTextOffset = 30f; // Adjust the vertical offset done
     public float delayBetweenIndicators = 2f;
     private TextMeshProUGUI distanceText;
-
     public TextMeshProUGUI tutorialText;
 
     bool sphereIndicatorActive;
@@ -30,6 +29,11 @@ public class NavigationTutorial : MonoBehaviour
     float speedCheckTimer = 0f;
     bool isCompleted = false;
     float sphereDistance;
+    bool successSfxPlayed;
+    bool stepStartSfxPlayed;
+    bool step6SFXPlayed;
+    public AudioSource successNotification;
+    public AudioSource stepStartSfx;
 
 
 
@@ -42,6 +46,9 @@ public class NavigationTutorial : MonoBehaviour
         height = FindObjectOfType<HeightCalculator>();
         speed = FindObjectOfType<SpeedController>();
         land = FindObjectOfType<CollisionHandler>();
+        successSfxPlayed = false;
+        stepStartSfxPlayed = false;
+        step6SFXPlayed = false;
     }
 
     void NavStart()
@@ -61,7 +68,6 @@ public class NavigationTutorial : MonoBehaviour
 
     void Update()
     {
-
         float sphereDistance = CalculateSphereDistance();
         float landingPadDistance = CalculateLandingPadDistance();
         float actualSpeed = speed.CalculateSpeed();
@@ -70,34 +76,33 @@ public class NavigationTutorial : MonoBehaviour
         delayTimer += Time.deltaTime;
         //Debug.Log(delayTimer);
         //delayTimer += Time.deltaTime;
-
         if (stepNo == 0) // Check if 5 seconds have elapsed
         {
             tutorialText.text = "Welcome To the Tutorial";
-            if (delayTimer >= 5f)
-            {
-                stepNo = 1;
-            }
+            StartCoroutine(WaitForNextStep(0, 4));
         }
         if (stepNo == 1)
         {
             tutorialText.text = "Move the Throttle Up By Pressing 'W' key to lift off";
-
+            StepStartSFX();
             if (actualHeight > 10)
             {
+                StepSuccessSFX();
                 tutorialText.text = "Congratulations!!";
                 StartCoroutine(WaitForNextStep(1, 4));
             }
         }
         if (stepNo == 2)
         {
-            tutorialText.text = "Try To Hover a Bit by experimenting with the throttle using 'W' and 'S'";
-            if (actualSpeed > -10 && actualSpeed < 10)
+            StepStartSFX();
+            tutorialText.text = "Try To Hover a Bit by maintaining the speed between -10 and 10 using 'W' and 'S' for a few seconds";
+            if (actualSpeed > -10 && actualSpeed < 10 || speedCheckTimer >= 5f)
             {
                 // Increment the speed check timer
                 speedCheckTimer += Time.deltaTime;
                 if (speedCheckTimer >= 5f) // Check if the speed condition has been held for at least 10 seconds
                 {
+                    StepSuccessSFX();
                     tutorialText.text = "Congratulations!!";
                     StartCoroutine(WaitForNextStep(2, 4));
                     //speedCheckTimer = 0f;
@@ -112,6 +117,7 @@ public class NavigationTutorial : MonoBehaviour
         if (stepNo == 3)
         {
             tutorialText.text = "Now Use 'D' Key to Move Right";
+            StepStartSFX();
             if (Input.GetKey(KeyCode.D) || speedCheckTimer >= 1f)
             {
                 speedCheckTimer += Time.deltaTime;
@@ -119,6 +125,7 @@ public class NavigationTutorial : MonoBehaviour
                 if (speedCheckTimer >= 1f)
                 {
                     //speedCheckTimer = 3f;
+                    StepSuccessSFX();
                     tutorialText.text = "Congratulations!!";
                     StartCoroutine(WaitForNextStep(3, 3)); //stepNo Delay
                     //speedCheckTimer = 0f;
@@ -133,6 +140,7 @@ public class NavigationTutorial : MonoBehaviour
         if (stepNo == 4)
         {
             tutorialText.text = "Now Use 'A' Key to Move Left";
+            StepStartSFX();
             if (Input.GetKey(KeyCode.A) || speedCheckTimer >= 1f)
             {
                 speedCheckTimer += Time.deltaTime;
@@ -140,6 +148,7 @@ public class NavigationTutorial : MonoBehaviour
                 if (speedCheckTimer >= 1f)
                 {
                     //speedCheckTimer = 3f;
+                    StepSuccessSFX();
                     tutorialText.text = "Congratulations!!";
                     StartCoroutine(WaitForNextStep(4, 3)); //stepNo Delay
                     //speedCheckTimer = 0f;
@@ -156,15 +165,17 @@ public class NavigationTutorial : MonoBehaviour
             if (!navigationArrow.enabled)
             {
                 NavStart();
-            }                     
-            if(isCompleted == false)
+            }
+            if (isCompleted == false)
             {
+                StepStartSFX();
                 SphereIndicator();
                 tutorialText.text = "Now Reach the navigation Point at an altitude";
             }
             if (sphereDistance <= 10f || isCompleted == true)
             {
                 isCompleted = true;
+                StepSuccessSFX();
                 tutorialText.text = "Congratulations!!";
                 distanceText.text = "";
                 navigationArrow.enabled = false;
@@ -178,13 +189,40 @@ public class NavigationTutorial : MonoBehaviour
                 NavStart();
             }
             tutorialText.text = "Now follow the Nav Arrow to Land by Lowering the Throttle";
+            StepStartSFX();
             sphereIndicatorActive = false; // Stop SphereIndicator method
             LandingIndicator(); // Run LandingIndicator method continuously
             if (landingPadDistance < 10f)
             {
+                if (!step6SFXPlayed)
+                {
+                    stepStartSfx.Play();
+                    step6SFXPlayed = true; // Set the flag to true to indicate that the SFX has been played
+                }
                 tutorialText.text = "Touch Down Smoothly and Cut Throttle to 0 Press 'X' after touchdown";
                 LandingIndicator();
             }
+        }
+    }
+
+
+    private void StepSuccessSFX()
+    {
+        if (!successSfxPlayed)
+        {
+            // Play the notification audio once
+            successNotification.Play();
+            successSfxPlayed = true; // Set the flag to true to indicate that the audio has been played
+        }
+    }
+
+    private void StepStartSFX()
+    {
+        if (!stepStartSfxPlayed)
+        {
+            // Play the notification audio once
+            stepStartSfx.Play();
+            stepStartSfxPlayed = true; // Set the flag to true to indicate that the audio has been played
         }
     }
 
@@ -195,6 +233,8 @@ public class NavigationTutorial : MonoBehaviour
         {
             stepNo += 1;
             speedCheckTimer = 0f;
+            successSfxPlayed = false;
+            stepStartSfxPlayed = false;
         }
     }
 

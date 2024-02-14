@@ -65,12 +65,12 @@ public class ThrustController : MonoBehaviour
 
     void IncreaseThrottle()
     {
-        throttle = Mathf.Min(throttle + Time.deltaTime / 10, 1f);
+        throttle = Mathf.Min(throttle + Time.deltaTime/3, 1f);
     }
 
     void DecreaseThrottle()
     {
-        throttle = Mathf.Max(throttle - Time.deltaTime / 10, 0.01f);
+        throttle = Mathf.Max(throttle - Time.deltaTime/3, 0.01f);
     }
 
     void ApplyThrust()
@@ -79,9 +79,9 @@ public class ThrustController : MonoBehaviour
 
         rb.AddRelativeForce(Vector3.up * thrustMultiplier * Time.deltaTime * 490);
         // Calculate the desired volume based on thrust
-        float desiredVolume = Mathf.Lerp(0.3f, 1f, throttle); // Adjust the volume range as needed
+        float desiredVolume = Mathf.Lerp(0.4f, 1f, throttle); // Adjust the volume range as needed
         // Calculate the desired pitch based on thrust
-        float desiredPitch = Mathf.Lerp(0.7f, 1.2f, throttle); // Adjust the pitch range as needed
+        float desiredPitch = Mathf.Lerp(0.5f, 1f, throttle); // Adjust the pitch range as needed
         // Set the volume and pitch of the audio source
         audioSource.volume = desiredVolume;
         audioSource.pitch = desiredPitch;
@@ -98,7 +98,7 @@ public class ThrustController : MonoBehaviour
             mainThrusterVFX.Play();
         }
 
-        float desiredScale = Mathf.Lerp(0.5f, 1f, throttle); // Adjust the range as needed
+        float desiredScale = Mathf.Lerp(0.3f, 1f, throttle); // Adjust the range as needed
 
         // Access the transform of the Particle System and set its local scale
         mainThrusterVFX.transform.localScale = new Vector3(desiredScale, desiredScale, desiredScale);
