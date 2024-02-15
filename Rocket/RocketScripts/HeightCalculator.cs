@@ -7,7 +7,7 @@ public class HeightCalculator : MonoBehaviour
 
     // Variable to store the relative height
     private float relativeHeight;
-    private int integerHeight;
+    public int integerHeight;
 
     void Start()
     {
@@ -31,8 +31,4 @@ public class HeightCalculator : MonoBehaviour
     }
 
     // Public method to get the relativeHeight value
-    public float GetRelativeHeight()
-    {
-        return integerHeight;
-    }
 }

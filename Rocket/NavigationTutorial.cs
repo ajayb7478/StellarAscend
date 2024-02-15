@@ -60,7 +60,7 @@ public class NavigationTutorial : MonoBehaviour
         float sphereDistance = CalculateSphereDistance();
         float landingPadDistance = CalculateLandingPadDistance();
         float actualSpeed = speed.CalculateSpeed();
-        float actualHeight = height.GetRelativeHeight();
+        float actualHeight = height.integerHeight;
         bool landed = land.isLanded;
         delayTimer += Time.deltaTime;
         //Debug.Log(delayTimer);

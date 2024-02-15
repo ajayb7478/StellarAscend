@@ -1,21 +1,29 @@
 using UnityEngine;
+using System.Collections;
 using TMPro;
 public class ThrustController : MonoBehaviour
 {
     private Rigidbody rb;
     [SerializeField] float mainThrust = 1;
     [SerializeField] AudioClip mainEngine;
+    [SerializeField] AudioSource engineStart;
     [SerializeField] ParticleSystem mainThrusterVFX;
     float throttle = 0f;
     AudioSource audioSource;
     public TextMeshProUGUI throttleText;
     public float Throttle { get { return throttle; } }
     private FuelController fuelController;
+    private EngineToggle engineToggle;
+    private HeightCalculator heightCalculator;
+    private bool isEngineOn = false;
+    private bool isDelayed = false;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
+        engineToggle = FindObjectOfType<EngineToggle>();
+        heightCalculator = FindObjectOfType<HeightCalculator>();
         throttleText.text = "Throttle: 0%";
         if (throttleText != null)
         {
@@ -26,8 +34,35 @@ public class ThrustController : MonoBehaviour
 
     void Update()
     {
-        ProcessThrust(fuelController.CurrentFuel);
-        UpdateThrottleUI();
+        Debug.Log(heightCalculator.integerHeight);
+        if (engineToggle.textState)
+        {
+            if (!isEngineOn)
+            {
+                isEngineOn = true;
+                engineStart.Play();
+                StartCoroutine(DelayedThrottle(1f)); // DelayedThrottle coroutine will set throttle to 0.4f after 2 seconds
+            }
+            ProcessThrust(fuelController.CurrentFuel);
+            UpdateThrottleUI();
+        }
+        else
+        {
+            StopThrusting();
+            UpdateThrottleUI();
+            isEngineOn = false;
+            isDelayed = false; // Reset the flag when engine is turned off
+        }
+    }
+
+    private IEnumerator DelayedThrottle(float delay)
+    {
+        if (!isDelayed)
+        {
+            isDelayed = true;
+            yield return new WaitForSeconds(delay);
+            throttle = 0.4f;
+        }
     }
 
     void UpdateThrottleUI()
@@ -65,12 +100,12 @@ public class ThrustController : MonoBehaviour
 
     void IncreaseThrottle()
     {
-        throttle = Mathf.Min(throttle + Time.deltaTime/3, 1f);
+        throttle = Mathf.Min(throttle + Time.deltaTime / 3, 1f);
     }
 
     void DecreaseThrottle()
     {
-        throttle = Mathf.Max(throttle - Time.deltaTime/3, 0.01f);
+        throttle = Mathf.Max(throttle - Time.deltaTime / 3, 0.01f);
     }
 
     void ApplyThrust()
