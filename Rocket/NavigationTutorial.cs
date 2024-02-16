@@ -22,7 +22,7 @@ public class NavigationTutorial : MonoBehaviour
     private CollisionHandler land;
     bool hasReachedHeight;
     bool isNavActive;
-    int stepNo = 0;
+    public int stepNo = 0;
     float speedCheckTimer = 0f;
     bool isCompleted = false;
     float sphereDistance;
@@ -31,6 +31,7 @@ public class NavigationTutorial : MonoBehaviour
     bool step6SFXPlayed;
     public AudioSource successNotification;
     public AudioSource stepStartSfx;
+    private EngineToggle engineToggle;
 
 
 
@@ -43,6 +44,7 @@ public class NavigationTutorial : MonoBehaviour
         height = FindObjectOfType<HeightCalculator>();
         speed = FindObjectOfType<SpeedController>();
         land = FindObjectOfType<CollisionHandler>();
+        engineToggle = FindObjectOfType<EngineToggle>();
         successSfxPlayed = false;
         stepStartSfxPlayed = false;
         step6SFXPlayed = false;
@@ -67,8 +69,13 @@ public class NavigationTutorial : MonoBehaviour
         //delayTimer += Time.deltaTime;
         if (stepNo == 0) // Check if 5 seconds have elapsed
         {
-            tutorialText.text = "Welcome To the Tutorial";
-            StartCoroutine(WaitForNextStep(0, 4));
+            tutorialText.text = "Welcome To the Tutorial .. Turn on the Engine";
+            if (engineToggle.textState)
+            {
+                StartCoroutine(WaitForNextStep(0, 4));
+                tutorialText.text = "Nice !! The Engine is now Running";
+            }
+
         }
         if (stepNo == 1)
         {
@@ -188,7 +195,7 @@ public class NavigationTutorial : MonoBehaviour
                     stepStartSfx.Play();
                     step6SFXPlayed = true; // Set the flag to true to indicate that the SFX has been played
                 }
-                tutorialText.text = "Touch Down Smoothly and Cut Throttle to 0 Press 'X' after touchdown";
+                tutorialText.text = "Touch Down Smoothly and turn off the Engine after touchdown";
                 ObjectiveIndicator(rocket, landingPad);
             }
         }

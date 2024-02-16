@@ -25,7 +25,7 @@ public class EngineToggle : MonoBehaviour
 
     void UpdateButtonText()
     {
-        buttonText.text = textState ? "Turn Engine Off" : "Turn Engine On"; // update the button text
+        buttonText.text = textState ? "Engine is Off" : "Engine is On"; // update the button text
     }
 
 }

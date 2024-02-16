@@ -7,6 +7,7 @@ public class ThrustController : MonoBehaviour
     [SerializeField] float mainThrust = 1;
     [SerializeField] AudioClip mainEngine;
     [SerializeField] AudioSource engineStart;
+    [SerializeField] AudioSource engineStop;
     [SerializeField] ParticleSystem mainThrusterVFX;
     float throttle = 0f;
     AudioSource audioSource;
@@ -41,17 +42,31 @@ public class ThrustController : MonoBehaviour
             {
                 isEngineOn = true;
                 engineStart.Play();
-                StartCoroutine(DelayedThrottle(1f)); // DelayedThrottle coroutine will set throttle to 0.4f after 2 seconds
+                StartCoroutine(DelayedThrottle(1.2f)); // DelayedThrottle coroutine will set throttle to 0.4f after 2 seconds
             }
             ProcessThrust(fuelController.CurrentFuel);
             UpdateThrottleUI();
         }
         else
         {
+            if (isEngineOn)
+            {
+                engineStop.Play();      // DelayedThrottle coroutine will set throttle to 0.4f after 2 seconds
+            }
+            isEngineOn = false;
+            StartCoroutine(DelayedThrottleOff(2.8f)); // Reset the flag when engine is turned off
+        }
+
+    }
+
+    private IEnumerator DelayedThrottleOff(float delay)
+    {
+        if (isDelayed)
+        {
+            isDelayed = false;
+            yield return new WaitForSeconds(delay);
             StopThrusting();
             UpdateThrottleUI();
-            isEngineOn = false;
-            isDelayed = false; // Reset the flag when engine is turned off
         }
     }
 
@@ -105,7 +120,7 @@ public class ThrustController : MonoBehaviour
 
     void DecreaseThrottle()
     {
-        throttle = Mathf.Max(throttle - Time.deltaTime / 3, 0.01f);
+        throttle = Mathf.Max(throttle - Time.deltaTime / 3, 0.3f);
     }
 
     void ApplyThrust()
