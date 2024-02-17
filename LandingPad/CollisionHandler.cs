@@ -116,8 +116,14 @@ public class CollisionHandler : MonoBehaviour
         }
         else if (other.gameObject.CompareTag("Finish") && rocketSpeed > -50f && landingGearStatus)
         {
-            isLanded = false;
+            //isLanded = false;
+            StartCrashSequence();
         }
+        else if (other.gameObject.CompareTag("Friendly") && landingGearStatus)
+        {
+            StartCrashSequence();
+        }
+
         else
         {
             switch (other.gameObject.tag)
