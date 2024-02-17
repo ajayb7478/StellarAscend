@@ -1,6 +1,6 @@
 using UnityEngine;
 using TMPro;
-
+using System.Collections;
 public class EngineToggle : MonoBehaviour
 { // this is the text box component that you want to toggle
     public TextMeshProUGUI buttonText;
@@ -25,7 +25,14 @@ public class EngineToggle : MonoBehaviour
 
     void UpdateButtonText()
     {
-        buttonText.text = textState ? "Engine is Off" : "Engine is On"; // update the button text
+        StartCoroutine(UpdateButtonTextWithDelay());
     }
+
+    IEnumerator UpdateButtonTextWithDelay()
+    {
+        yield return new WaitForSeconds(1.2f);
+        buttonText.text = textState ? "Cut-Off" : "Run Ignition"; // update the button text
+    }
+
 
 }

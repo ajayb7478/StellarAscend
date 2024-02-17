@@ -60,13 +60,13 @@ public class CollisionHandler : MonoBehaviour
         }
         else
         {
-            finalStep = 6;
+            finalStep = 7;
         }
         UpdateRocketSpeed();
         currentThrottle = thrustController.Throttle;
         roundedThrottle = Mathf.Round(currentThrottle * 10f) / 10f;
         //Debug.Log(roundedThrottle);
-        if (roundedThrottle == 0 && isLanded == true && !isTransitioning && zRotationInt == 0 && finalStep == 6)
+        if (roundedThrottle == 0 && isLanded == true && !isTransitioning && zRotationInt == 0 && finalStep == 7)
         {
             StartSuccessSequence();
             //Debug.Log("Success Sequence Conditions Met!");

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System;
 
 public class NavigationTutorial : MonoBehaviour
 {
@@ -32,7 +33,8 @@ public class NavigationTutorial : MonoBehaviour
     public AudioSource successNotification;
     public AudioSource stepStartSfx;
     private EngineToggle engineToggle;
-
+    bool landingGearStatus;
+    private TriggerLandingGear triggerLandingGear;
 
 
     void Start()
@@ -45,6 +47,7 @@ public class NavigationTutorial : MonoBehaviour
         speed = FindObjectOfType<SpeedController>();
         land = FindObjectOfType<CollisionHandler>();
         engineToggle = FindObjectOfType<EngineToggle>();
+        triggerLandingGear = FindObjectOfType<TriggerLandingGear>();
         successSfxPlayed = false;
         stepStartSfxPlayed = false;
         step6SFXPlayed = false;
@@ -53,7 +56,6 @@ public class NavigationTutorial : MonoBehaviour
     void NavStart()
     {
         navigationArrow.enabled = true;
-        // Add TextMeshPro component to the new GameObject
         sphereIndicatorActive = true;
     }
 
@@ -65,98 +67,62 @@ public class NavigationTutorial : MonoBehaviour
         float actualHeight = height.integerHeight;
         bool landed = land.isLanded;
         delayTimer += Time.deltaTime;
+        landingGearStatus = triggerLandingGear.extended;
         //Debug.Log(delayTimer);
         //delayTimer += Time.deltaTime;
-        if (stepNo == 0) // Check if 5 seconds have elapsed
-        {
-            tutorialText.text = "Welcome To the Tutorial .. Turn on the Engine";
-            if (engineToggle.textState)
-            {
-                StartCoroutine(WaitForNextStep(0, 4));
-                tutorialText.text = "Nice !! The Engine is now Running";
-            }
+        WelcomeStep(0);
+        MoveThrottleUpStep(actualHeight, 1);
+        LiftUpLandingGearStep(landingGearStatus, 2);  // the last parameter is the step number 
+        HoverStep(actualSpeed, 3);
+        MoveRightStep(4);
+        MoveLeftStep(5);
+        GoToSphereStep(sphereDistance, 6);
+        GoToLandingPadStep(landingPadDistance, 7); //Always has to be the last step
+    }
 
-        }
-        if (stepNo == 1)
+    void LiftUpLandingGearStep(bool landingGearStatus, int currentStepNo)
+    {
+        if (stepNo == currentStepNo) // Check if 5 seconds have elapsed
         {
-            tutorialText.text = "Move the Throttle Up By Pressing 'W' key to lift off";
-            StepStartSFX();
-            if (actualHeight > 10)
+
+            tutorialText.text = "Press L to lift up the landing gear";
+            if (landingGearStatus)
             {
+                StartCoroutine(WaitForNextStep(currentStepNo, 2));
                 StepSuccessSFX();
-                tutorialText.text = "Congratulations!!";
-                StartCoroutine(WaitForNextStep(1, 4));
+                tutorialText.text = "Great Job!";
             }
         }
-        if (stepNo == 2)
+    }
+
+    void GoToLandingPadStep(float landingPadDistance, int currentStepNo)
+    {
+        if (stepNo == currentStepNo)
         {
-            StepStartSFX();
-            tutorialText.text = "Try To Hover a Bit by maintaining the speed between -10 and 10 using 'W' and 'S' for a few seconds";
-            if (actualSpeed > -10 && actualSpeed < 10 || speedCheckTimer >= 5f)
+            if (!navigationArrow.enabled)
             {
-                // Increment the speed check timer
-                speedCheckTimer += Time.deltaTime;
-                if (speedCheckTimer >= 5f) // Check if the speed condition has been held for at least 10 seconds
-                {
-                    StepSuccessSFX();
-                    tutorialText.text = "Congratulations!!";
-                    StartCoroutine(WaitForNextStep(2, 4));
-                    //speedCheckTimer = 0f;
-                }
+                NavStart();
             }
-            else
+            tutorialText.text = "Now follow the Nav Arrow to Land by Lowering the Throttle";
+            StepStartSFX();
+            sphereIndicatorActive = false; // Stop SphereIndicator method
+            ObjectiveIndicator(rocket, landingPad); // Run LandingIndicator method continuously
+            if (landingPadDistance < 20f)
             {
-                // Reset the speed check timer if the speed is not within the desired range
-                speedCheckTimer = 0f;
+                if (!step6SFXPlayed)
+                {
+                    stepStartSfx.Play();
+                    step6SFXPlayed = true; // Set the flag to true to indicate that the SFX has been played
+                }
+                tutorialText.text = "Lower Landing Gear and Touch Down Smoothly";
+                ObjectiveIndicator(rocket, landingPad);
             }
         }
-        if (stepNo == 3)
-        {
-            tutorialText.text = "Now Use 'D' Key to Move Right";
-            StepStartSFX();
-            if (Input.GetKey(KeyCode.D) || speedCheckTimer >= 1f)
-            {
-                speedCheckTimer += Time.deltaTime;
-                Debug.Log(speedCheckTimer);
-                if (speedCheckTimer >= 1f)
-                {
-                    //speedCheckTimer = 3f;
-                    StepSuccessSFX();
-                    tutorialText.text = "Congratulations!!";
-                    StartCoroutine(WaitForNextStep(3, 3)); //stepNo Delay
-                    //speedCheckTimer = 0f;
-                }
-            }
-            else
-            {
-                // Reset the speed check timer if the speed is not within the desired range
-                speedCheckTimer = 0f;
-            }
-        }
-        if (stepNo == 4)
-        {
-            tutorialText.text = "Now Use 'A' Key to Move Left";
-            StepStartSFX();
-            if (Input.GetKey(KeyCode.A) || speedCheckTimer >= 1f)
-            {
-                speedCheckTimer += Time.deltaTime;
-                Debug.Log(speedCheckTimer);
-                if (speedCheckTimer >= 1f)
-                {
-                    //speedCheckTimer = 3f;
-                    StepSuccessSFX();
-                    tutorialText.text = "Congratulations!!";
-                    StartCoroutine(WaitForNextStep(4, 3)); //stepNo Delay
-                    //speedCheckTimer = 0f;
-                }
-            }
-            else
-            {
-                // Reset the speed check timer if the speed is not within the desired range
-                speedCheckTimer = 0f;
-            }
-        }
-        if (stepNo == 5)
+    }
+
+    void GoToSphereStep(float sphereDistance, int currentStepNo)
+    {
+        if (stepNo == currentStepNo)
         {
             if (!navigationArrow.enabled)
             {
@@ -175,32 +141,118 @@ public class NavigationTutorial : MonoBehaviour
                 tutorialText.text = "Congratulations!!";
                 distanceText.text = "";
                 navigationArrow.enabled = false;
-                StartCoroutine(WaitForNextStep(5, 4));
-            }
-        }
-        if (stepNo == 6)
-        {
-            if (!navigationArrow.enabled)
-            {
-                NavStart();
-            }
-            tutorialText.text = "Now follow the Nav Arrow to Land by Lowering the Throttle";
-            StepStartSFX();
-            sphereIndicatorActive = false; // Stop SphereIndicator method
-            ObjectiveIndicator(rocket, landingPad); // Run LandingIndicator method continuously
-            if (landingPadDistance < 10f)
-            {
-                if (!step6SFXPlayed)
-                {
-                    stepStartSfx.Play();
-                    step6SFXPlayed = true; // Set the flag to true to indicate that the SFX has been played
-                }
-                tutorialText.text = "Touch Down Smoothly and turn off the Engine after touchdown";
-                ObjectiveIndicator(rocket, landingPad);
+                StartCoroutine(WaitForNextStep(currentStepNo, 4));
             }
         }
     }
 
+    void MoveLeftStep(int currentStepNo)
+    {
+        if (stepNo == currentStepNo)
+        {
+            tutorialText.text = "Now Use 'A' Key to Move Left";
+            StepStartSFX();
+            if (Input.GetKey(KeyCode.A) || speedCheckTimer >= 1f)
+            {
+                speedCheckTimer += Time.deltaTime;
+                Debug.Log(speedCheckTimer);
+                if (speedCheckTimer >= 1f)
+                {
+                    //speedCheckTimer = 3f;
+                    StepSuccessSFX();
+                    tutorialText.text = "Congratulations!!";
+                    StartCoroutine(WaitForNextStep(currentStepNo, 3)); //stepNo Delay
+                    //speedCheckTimer = 0f;
+                }
+            }
+            else
+            {
+                // Reset the speed check timer if the speed is not within the desired range
+                speedCheckTimer = 0f;
+            }
+        }
+    }
+
+    void MoveRightStep(int currentStepNo)
+    {
+        if (stepNo == currentStepNo)
+        {
+            tutorialText.text = "Now Use 'D' Key to Move Right";
+            StepStartSFX();
+            if (Input.GetKey(KeyCode.D) || speedCheckTimer >= 1f)
+            {
+                speedCheckTimer += Time.deltaTime;
+                Debug.Log(speedCheckTimer);
+                if (speedCheckTimer >= 1f)
+                {
+                    //speedCheckTimer = 3f;
+                    StepSuccessSFX();
+                    tutorialText.text = "Congratulations!!";
+                    StartCoroutine(WaitForNextStep(currentStepNo, 3)); //stepNo Delay
+                    //speedCheckTimer = 0f;
+                }
+            }
+            else
+            {
+                // Reset the speed check timer if the speed is not within the desired range
+                speedCheckTimer = 0f;
+            }
+        }
+    }
+
+    void HoverStep(float actualSpeed, int currentStepNo)
+    {
+        if (stepNo == currentStepNo)
+        {
+            StepStartSFX();
+            tutorialText.text = "Try To Hover a Bit by maintaining the speed between -10 and 10 using 'W' and 'S' for a few seconds";
+            if (actualSpeed > -10 && actualSpeed < 10 || speedCheckTimer >= 5f)
+            {
+                // Increment the speed check timer
+                speedCheckTimer += Time.deltaTime;
+                if (speedCheckTimer >= 5f) // Check if the speed condition has been held for at least 10 seconds
+                {
+                    StepSuccessSFX();
+                    tutorialText.text = "Congratulations!!";
+                    StartCoroutine(WaitForNextStep(currentStepNo, 4));
+                    //speedCheckTimer = 0f;
+                }
+            }
+            else
+            {
+                // Reset the speed check timer if the speed is not within the desired range
+                speedCheckTimer = 0f;
+            }
+        }
+    }
+
+    void MoveThrottleUpStep(float actualHeight, int currentStepNo)
+    {
+        if (stepNo == currentStepNo)
+        {
+            tutorialText.text = "Move the Throttle Up By Pressing 'W' key to lift off";
+            StepStartSFX();
+            if (actualHeight > 10)
+            {
+                StepSuccessSFX();
+                tutorialText.text = "Congratulations!!";
+                StartCoroutine(WaitForNextStep(currentStepNo, 4));
+            }
+        }
+    }
+
+    void WelcomeStep(int currentStepNo)
+    {
+        if (stepNo == currentStepNo) // Check if 5 seconds have elapsed
+        {
+            tutorialText.text = "Welcome To the Tutorial .. Turn on the Engine";
+            if (engineToggle.textState)
+            {
+                StartCoroutine(WaitForNextStep(currentStepNo, 4));
+                tutorialText.text = "Nice !! The Engine is now Running";
+            }
+        }
+    }
 
     private void StepSuccessSFX()
     {
@@ -288,7 +340,5 @@ public class NavigationTutorial : MonoBehaviour
             distanceText.text = "" + Mathf.RoundToInt(distance) + "m";
         }
     }
-
-
 
 }
