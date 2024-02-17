@@ -29,12 +29,15 @@ public class CollisionHandler : MonoBehaviour
     private NavigationTutorial navigationTutorial;
     int finalStep;
     int sceneId;
+    private TriggerLandingGear triggerLandingGear;
+    bool landingGearStatus;
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
         rocketRigidbody = GetComponent<Rigidbody>();
         thrustController = GetComponent<ThrustController>();
+        triggerLandingGear = FindObjectOfType<TriggerLandingGear>();
         sceneId = SceneManager.GetActiveScene().buildIndex;
         if (sceneId == 1)
         {
@@ -49,6 +52,8 @@ public class CollisionHandler : MonoBehaviour
     void Update()
     {
         //RespondToDebugKeys();
+        //Debug.Log(isLanded);
+        landingGearStatus = triggerLandingGear.extended;
         if (sceneId == 1)
         {
             finalStep = navigationTutorial.stepNo;
@@ -105,9 +110,13 @@ public class CollisionHandler : MonoBehaviour
         if (isTransitioning || collisionDisabled) { return; }
 
         // Check if the collision is with the ground and the speed is less than -30
-        if (other.gameObject.CompareTag("Finish") && rocketSpeed > -50f)
+        if (other.gameObject.CompareTag("Finish") && rocketSpeed > -50f && !landingGearStatus)
         {
             isLanded = true;
+        }
+        else if (other.gameObject.CompareTag("Finish") && rocketSpeed > -50f && landingGearStatus)
+        {
+            isLanded = false;
         }
         else
         {
@@ -123,6 +132,16 @@ public class CollisionHandler : MonoBehaviour
                     StartCrashSequence();
                     break;
             }
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        // Check if the previously collided object had the "Finish" tag
+        if (collision.gameObject.CompareTag("Finish"))
+        {
+            // Set the collision flag to false
+            isLanded = false;
         }
     }
 

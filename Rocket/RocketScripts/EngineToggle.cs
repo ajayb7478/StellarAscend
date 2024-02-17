@@ -18,7 +18,7 @@ public class EngineToggle : MonoBehaviour
     {
         textState = !textState;
         UpdateButtonText();
-        Debug.Log(textState);
+        //Debug.Log(textState);
     }
 
 

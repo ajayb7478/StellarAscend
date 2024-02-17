@@ -19,8 +19,6 @@ public class NavigationController : MonoBehaviour
     int stepNo = 0;
     int sceneId;
 
-
-
     bool sphereIndicatorActive;
 
     [SerializeField] float ObjectiveHeight;
@@ -33,7 +31,7 @@ public class NavigationController : MonoBehaviour
         tutorialText.text = "Reach the target";
         sphereIndicatorActive = true;
         successSfxPlayed = false;
-        sceneId = SceneManager.GetActiveScene().buildIndex;
+        sceneId = SceneManager.GetActiveScene().buildIndex;    
     }
 
     void Update()

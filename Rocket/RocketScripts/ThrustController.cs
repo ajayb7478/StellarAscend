@@ -35,7 +35,7 @@ public class ThrustController : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(heightCalculator.integerHeight);
+        // Debug.Log(heightCalculator.integerHeight);
         if (engineToggle.textState)
         {
             if (!isEngineOn)
