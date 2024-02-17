@@ -84,7 +84,7 @@ public class NavigationTutorial : MonoBehaviour
     {
         if (stepNo == currentStepNo) // Check if 5 seconds have elapsed
         {
-
+            StepStartSFX();
             tutorialText.text = "Press L to lift up the landing gear";
             if (landingGearStatus)
             {
