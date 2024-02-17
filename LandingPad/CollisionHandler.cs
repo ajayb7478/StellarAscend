@@ -26,12 +26,20 @@ public class CollisionHandler : MonoBehaviour
     float zRotation;
     int zRotationInt;
     public bool isLanded { get; private set; }
+    private NavigationTutorial navigationTutorial;
+    int finalStep;
+    int sceneId;
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
         rocketRigidbody = GetComponent<Rigidbody>();
         thrustController = GetComponent<ThrustController>();
+        sceneId = SceneManager.GetActiveScene().buildIndex;
+        if (sceneId == 1)
+        {
+            navigationTutorial = FindObjectOfType<NavigationTutorial>();
+        }
         // Get the MeshRenderer from the specified GameObjec
         // Get the reference to the Rigidbody component
         isLanded = false;
@@ -41,11 +49,19 @@ public class CollisionHandler : MonoBehaviour
     void Update()
     {
         //RespondToDebugKeys();
+        if (sceneId == 1)
+        {
+            finalStep = navigationTutorial.stepNo;
+        }
+        else
+        {
+            finalStep = 6;
+        }
         UpdateRocketSpeed();
         currentThrottle = thrustController.Throttle;
         roundedThrottle = Mathf.Round(currentThrottle * 10f) / 10f;
         //Debug.Log(roundedThrottle);
-        if (roundedThrottle == 0 && isLanded == true && !isTransitioning && zRotationInt == 0)
+        if (roundedThrottle == 0 && isLanded == true && !isTransitioning && zRotationInt == 0 && finalStep == 6)
         {
             StartSuccessSequence();
             //Debug.Log("Success Sequence Conditions Met!");

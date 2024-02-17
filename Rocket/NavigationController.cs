@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class NavigationController : MonoBehaviour
@@ -12,6 +13,12 @@ public class NavigationController : MonoBehaviour
     public Transform sphere;
     public Vector2 screenOffset = new Vector2(20f, 20f); // Adjust the offset as needed
     public TextMeshProUGUI distanceText;
+    public TextMeshProUGUI tutorialText;
+    public AudioSource successNotification;
+    bool successSfxPlayed;
+    int stepNo = 0;
+    int sceneId;
+
 
 
     bool sphereIndicatorActive;
@@ -23,7 +30,10 @@ public class NavigationController : MonoBehaviour
         // Create a new GameObject for TextMeshPro and set it as a child of navigationArrow
         // Add TextMeshPro component to the new GameObject
         //  distanceText = textMeshProObject.AddComponent<TextMeshProUGUI>();
+        tutorialText.text = "Reach the target";
         sphereIndicatorActive = true;
+        successSfxPlayed = false;
+        sceneId = SceneManager.GetActiveScene().buildIndex;
     }
 
     void Update()
@@ -32,16 +42,33 @@ public class NavigationController : MonoBehaviour
         Vector3 relativePosition = rocket.InverseTransformPoint(sphere.position);
 
 
+
         float sphereDistance = Vector3.Distance(rocket.position, sphere.position);
 
         if (sphereDistance >= 10f && sphereIndicatorActive == true)
         {
             ObjectiveIndicator(rocket, sphere);// Run SphereIndicator method
+            tutorialText.text = "Reach the target";
         }
         else
         {
+            if (!successSfxPlayed)
+            {
+                // Play the notification audio once
+                successNotification.Play();
+                successSfxPlayed = true; // Set the flag to true to indicate that the audio has been played
+            }
             sphereIndicatorActive = false; // Stop SphereIndicator method
-            ObjectiveIndicator(rocket, landingPad); // Run LandingIndicator method continuously
+            ObjectiveIndicator(rocket, landingPad);
+            if (sceneId == 4)
+            {
+                tutorialText.text = "Land on the moving landing pad";
+            }
+            else
+            {
+                tutorialText.text = "Land on the landing pad";
+            }
+            // Run LandingIndicator method continuously
         }
     }
 
