@@ -22,7 +22,7 @@ public class SideThrusterController : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.A))
         {
-            rb.AddRelativeForce(Vector3.left * Time.deltaTime * mainThrust * 200);
+            rb.AddRelativeForce(Vector3.left * Time.deltaTime * mainThrust * 100);
             if (!rightThrustersVFX.isPlaying)
             {
                 rightThrustersVFX.Play();
@@ -30,13 +30,13 @@ public class SideThrusterController : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            rb.AddRelativeForce(Vector3.right * Time.deltaTime * mainThrust * 200);
+            rb.AddRelativeForce(Vector3.right * Time.deltaTime * mainThrust * 100);
             if (!leftThrustersVFX.isPlaying)
             {
                 leftThrustersVFX.Play();
             }
         }
-        else if (Input.GetKey(KeyCode.E))
+       /*  else if (Input.GetKey(KeyCode.E))
         {
             rb.AddTorque(transform.right * torque * Time.deltaTime * 800);
             if (!rightThrustersVFX.isPlaying)
@@ -51,7 +51,7 @@ public class SideThrusterController : MonoBehaviour
             {
                 leftThrustersVFX.Play();
             }
-        }
+        } */
         else
         {
             rightThrustersVFX.Stop();

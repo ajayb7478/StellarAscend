@@ -23,7 +23,7 @@ public class NavigationTutorial : MonoBehaviour
     private CollisionHandler land;
     bool hasReachedHeight;
     bool isNavActive;
-    public int stepNo = 0;
+    int stepNo = 0;
     float speedCheckTimer = 0f;
     bool isCompleted = false;
     float sphereDistance;
@@ -35,6 +35,10 @@ public class NavigationTutorial : MonoBehaviour
     private EngineToggle engineToggle;
     bool landingGearStatus;
     private TriggerLandingGear triggerLandingGear;
+    float sideSpeed;
+    float  landingPadDistance;
+    float actualHeight;
+    float actualSpeed;
 
 
     void Start()
@@ -61,29 +65,26 @@ public class NavigationTutorial : MonoBehaviour
 
     void Update()
     {
-        float sphereDistance = CalculateSphereDistance();
-        float landingPadDistance = CalculateLandingPadDistance();
-        float actualSpeed = speed.CalculateSpeed();
-        float actualHeight = height.integerHeight;
+        float sideSpeed = speed.CalculateSideSpeed();
         bool landed = land.isLanded;
         delayTimer += Time.deltaTime;
-        landingGearStatus = triggerLandingGear.extended;
-        //Debug.Log(delayTimer);
+        Debug.Log(sideSpeed);
         //delayTimer += Time.deltaTime;
         WelcomeStep(0);
-        MoveThrottleUpStep(actualHeight, 1);
-        LiftUpLandingGearStep(landingGearStatus, 2);  // the last parameter is the step number 
-        HoverStep(actualSpeed, 3);
+        MoveThrottleUpStep(1);
+        LiftUpLandingGearStep(2);  // the last parameter is the step number 
+        HoverStep(3);
         MoveRightStep(4);
         MoveLeftStep(5);
-        GoToSphereStep(sphereDistance, 6);
-        GoToLandingPadStep(landingPadDistance, 7); //Always has to be the last step
+        GoToSphereStep(6);
+        GoToLandingPadStep(7); //Always has to be the last step
     }
 
-    void LiftUpLandingGearStep(bool landingGearStatus, int currentStepNo)
+    void LiftUpLandingGearStep(int currentStepNo)
     {
         if (stepNo == currentStepNo) // Check if 5 seconds have elapsed
         {
+            landingGearStatus = triggerLandingGear.extended;
             StepStartSFX();
             tutorialText.text = "Press L to lift up the landing gear";
             if (landingGearStatus)
@@ -95,7 +96,7 @@ public class NavigationTutorial : MonoBehaviour
         }
     }
 
-    void GoToLandingPadStep(float landingPadDistance, int currentStepNo)
+    void GoToLandingPadStep(int currentStepNo)
     {
         if (stepNo == currentStepNo)
         {
@@ -107,6 +108,7 @@ public class NavigationTutorial : MonoBehaviour
             StepStartSFX();
             sphereIndicatorActive = false; // Stop SphereIndicator method
             ObjectiveIndicator(rocket, landingPad); // Run LandingIndicator method continuously
+            landingPadDistance = CalculateLandingPadDistance();
             if (landingPadDistance < 20f)
             {
                 if (!step6SFXPlayed)
@@ -120,10 +122,11 @@ public class NavigationTutorial : MonoBehaviour
         }
     }
 
-    void GoToSphereStep(float sphereDistance, int currentStepNo)
+    void GoToSphereStep(int currentStepNo)
     {
         if (stepNo == currentStepNo)
         {
+            sphereDistance = CalculateSphereDistance();
             if (!navigationArrow.enabled)
             {
                 NavStart();
@@ -150,13 +153,13 @@ public class NavigationTutorial : MonoBehaviour
     {
         if (stepNo == currentStepNo)
         {
-            tutorialText.text = "Now Use 'A' Key to Move Left";
+            tutorialText.text = "Now Use 'A' Key to Move Left to Stop Counter the Right movement";
             StepStartSFX();
-            if (Input.GetKey(KeyCode.A) || speedCheckTimer >= 1f)
+
+            if (Input.GetKey(KeyCode.A) || sideSpeed < 10)
             {
-                speedCheckTimer += Time.deltaTime;
-                Debug.Log(speedCheckTimer);
-                if (speedCheckTimer >= 1f)
+                sideSpeed = speed.CalculateSideSpeed();
+                if (sideSpeed < 10)
                 {
                     //speedCheckTimer = 3f;
                     StepSuccessSFX();
@@ -164,11 +167,6 @@ public class NavigationTutorial : MonoBehaviour
                     StartCoroutine(WaitForNextStep(currentStepNo, 3)); //stepNo Delay
                     //speedCheckTimer = 0f;
                 }
-            }
-            else
-            {
-                // Reset the speed check timer if the speed is not within the desired range
-                speedCheckTimer = 0f;
             }
         }
     }
@@ -179,11 +177,11 @@ public class NavigationTutorial : MonoBehaviour
         {
             tutorialText.text = "Now Use 'D' Key to Move Right";
             StepStartSFX();
-            if (Input.GetKey(KeyCode.D) || speedCheckTimer >= 1f)
+
+            if (Input.GetKey(KeyCode.D) || sideSpeed >= 40)
             {
-                speedCheckTimer += Time.deltaTime;
-                Debug.Log(speedCheckTimer);
-                if (speedCheckTimer >= 1f)
+                sideSpeed = speed.CalculateSideSpeed();
+                if (sideSpeed >= 40)
                 {
                     //speedCheckTimer = 3f;
                     StepSuccessSFX();
@@ -192,20 +190,16 @@ public class NavigationTutorial : MonoBehaviour
                     //speedCheckTimer = 0f;
                 }
             }
-            else
-            {
-                // Reset the speed check timer if the speed is not within the desired range
-                speedCheckTimer = 0f;
-            }
         }
     }
 
-    void HoverStep(float actualSpeed, int currentStepNo)
+    void HoverStep(int currentStepNo)
     {
         if (stepNo == currentStepNo)
         {
             StepStartSFX();
             tutorialText.text = "Try To Hover a Bit by maintaining the speed between -10 and 10 using 'W' and 'S' for a few seconds";
+            actualSpeed = speed.CalculateSpeed();
             if (actualSpeed > -10 && actualSpeed < 10 || speedCheckTimer >= 5f)
             {
                 // Increment the speed check timer
@@ -226,12 +220,13 @@ public class NavigationTutorial : MonoBehaviour
         }
     }
 
-    void MoveThrottleUpStep(float actualHeight, int currentStepNo)
+    void MoveThrottleUpStep(int currentStepNo)
     {
         if (stepNo == currentStepNo)
         {
             tutorialText.text = "Move the Throttle Up By Pressing 'W' key to lift off";
             StepStartSFX();
+            actualHeight = height.integerHeight;
             if (actualHeight > 10)
             {
                 StepSuccessSFX();

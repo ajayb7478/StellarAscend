@@ -5,6 +5,7 @@ public class SpeedController : MonoBehaviour
 {
     private Rigidbody rb;
     private float currentSpeed;
+    private float currentSideSpeed;
     public TextMeshProUGUI speedText;
 
     //public float CurrentSpeed { get { return currentSpeed; } }
@@ -22,6 +23,7 @@ public class SpeedController : MonoBehaviour
     void Update()
     {
         CalculateSpeed();
+        CalculateSideSpeed();
         UpdateSpeedText();
     }
 
@@ -29,6 +31,11 @@ public class SpeedController : MonoBehaviour
     {
         currentSpeed = Vector3.Dot(rb.velocity, transform.up) * 10;
         return currentSpeed;
+    }
+    public float CalculateSideSpeed()
+    {
+        currentSideSpeed = Vector3.Dot(rb.velocity, transform.right) * 10;
+        return Mathf.FloorToInt(currentSideSpeed); ;
     }
 
     void UpdateSpeedText()
