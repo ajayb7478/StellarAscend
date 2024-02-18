@@ -23,7 +23,7 @@ public class NavigationTutorial : MonoBehaviour
     private CollisionHandler land;
     bool hasReachedHeight;
     bool isNavActive;
-    int stepNo = 0;
+    public int stepNo = 0;
     float speedCheckTimer = 0f;
     bool isCompleted = false;
     float sphereDistance;
